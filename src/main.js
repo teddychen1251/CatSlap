@@ -1,6 +1,6 @@
 const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);
-const createScene = function () {
+const createScene = async function () {
     const scene = new BABYLON.Scene(engine);
     const camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
     camera.setTarget(BABYLON.Vector3.Zero());
@@ -9,13 +9,14 @@ const createScene = function () {
     const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 2, segments: 32}, scene);
     sphere.position.y = 1;
     const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
+    const xr = await scene.createDefaultXRExperienceAsync();
     return scene;
 };
 const scene = createScene();
-engine.runRenderLoop(function () {
-        scene.render();
-});
+createScene().then(scene => {
+    engine.runRenderLoop(() => scene.render());
+})
 // Watch for browser/canvas resize events
 window.addEventListener("resize", function () {
-        engine.resize();
+    engine.resize();
 });
