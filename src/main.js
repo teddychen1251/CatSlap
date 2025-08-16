@@ -9,7 +9,11 @@ const createScene = async function () {
     const sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 2, segments: 32}, scene);
     sphere.position.y = 1;
     const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
-    const xr = await scene.createDefaultXRExperienceAsync();
+    const xr = await scene.createDefaultXRExperienceAsync({
+        disablePointerSelection: true,
+        inputOptions: { doNotLoadControllerMeshes: true },
+    });
+    const player = new Player(scene, xr);
     return scene;
 };
 const scene = createScene();
