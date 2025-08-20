@@ -1,4 +1,5 @@
 class Player {
+    static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075)
     #headCamera;
     #bodyMesh;
     #hands = [];
@@ -13,11 +14,12 @@ class Player {
             }, 
             scene
         ); 
-        const bodyClone = this.#bodyMesh.clone();
         scene.onBeforeRenderObservable.add(() => {
-            this.#bodyMesh.rotation.y = this.#headCamera.rotationQuaternion.toEulerAngles().y;
-            this.#bodyMesh.position = this.#headCamera.position.subtract(new BABYLON.Vector3(0, .45, 0.075));
-            bodyClone.position = this.#bodyMesh.position.add(new BABYLON.Vector3(0, 0, 0.5))
+            const headRotationY = this.#headCamera.rotationQuaternion.toEulerAngles().y
+            this.#bodyMesh.rotation.y = headRotationY;
+            const bodyOffset = Player.#bodyLocalOffset
+                .applyRotationQuaternionInPlace(BABYLON.Quaternion.FromEulerAngles(0, headRotationY, 0))
+            this.#bodyMesh.position = this.#headCamera.position.subtract(bodyOffset);
         })
         xr.input.onControllerAddedObservable.add(controllerInputSource => {
             this.#hands.push(new Hand(controllerInputSource, scene));
