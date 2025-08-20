@@ -12,6 +12,7 @@ const createScene = async function () {
     });
     xr.baseExperience.camera.setTransformationFromNonVRCamera()
     const player = new Player(scene, xr);
+    const cage = new Cage(scene);
     return scene;
 };
 const scene = createScene();
