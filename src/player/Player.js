@@ -5,18 +5,16 @@ class Player {
     #hands = [];
     constructor(scene, xr) {
         this.#headCamera = xr.baseExperience.camera;
-        this.#bodyMesh = BABYLON.MeshBuilder.CreateBox(
+        this.#bodyMesh = BABYLON.MeshBuilder.CreateCapsule(
             "playerBody", 
             {
                 height: 0.6,
-                width: .35,
-                depth: .1,
+                radius: .2,
             }, 
             scene
         ); 
         scene.onBeforeRenderObservable.add(() => {
             const headRotationY = this.#headCamera.rotationQuaternion.toEulerAngles().y
-            this.#bodyMesh.rotation.y = headRotationY;
             const bodyOffset = Player.#bodyLocalOffset
                 .applyRotationQuaternion(BABYLON.Quaternion.FromEulerAngles(0, headRotationY, 0))
             this.#bodyMesh.position = this.#headCamera.position.subtract(bodyOffset);
