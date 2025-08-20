@@ -18,7 +18,7 @@ class Player {
             const headRotationY = this.#headCamera.rotationQuaternion.toEulerAngles().y
             this.#bodyMesh.rotation.y = headRotationY;
             const bodyOffset = Player.#bodyLocalOffset
-                .applyRotationQuaternionInPlace(BABYLON.Quaternion.FromEulerAngles(0, headRotationY, 0))
+                .applyRotationQuaternion(BABYLON.Quaternion.FromEulerAngles(0, headRotationY, 0))
             this.#bodyMesh.position = this.#headCamera.position.subtract(bodyOffset);
         })
         xr.input.onControllerAddedObservable.add(controllerInputSource => {
