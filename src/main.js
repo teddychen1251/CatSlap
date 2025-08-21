@@ -10,6 +10,17 @@ const createScene = async function () {
         disablePointerSelection: true,
         inputOptions: { doNotLoadControllerMeshes: true },
     });
+    xr.baseExperience.featuresManager.enableFeature(
+        BABYLON.WebXRFeatureName.HAND_TRACKING, 
+        "latest", 
+        {
+            xrInput: xr.input,
+            jointMeshes: {
+                disableDefaultHandMesh: true,
+                invisible: true,
+            },
+        }
+    );
     xr.baseExperience.camera.setTransformationFromNonVRCamera()
     const player = new Player(scene, xr);
     const cage = new Cage(scene);
