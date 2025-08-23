@@ -27,10 +27,18 @@ class ExtendingArm {
 
         this.#paw = new Paw(scene);
 
-        this.#node.position = new BABYLON.Vector3(0, 1, .5)
         scene.onBeforeRenderObservable.add(() => {
             this.#paw.mesh.position = pawPositionNode.absolutePosition
-            this.#node.scaling.y += 0.01
+            // this.#node.scaling.y += 0.01
         })
+    }
+
+    spawnAndPoint(spawnPosition, pointPosition) {
+        this.#node.position = spawnPosition
+        this.#node.lookAt(
+            pointPosition,
+            0,
+            Math.PI / 2
+        )
     }
 }

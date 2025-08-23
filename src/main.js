@@ -25,6 +25,10 @@ const createScene = async function () {
     const player = new Player(scene, xr);
     const cage = new Cage(scene);
     const arm = new ExtendingArm(scene)
+    arm.spawnAndPoint(
+        new BABYLON.Vector3(1, 1, 1),
+        new BABYLON.Vector3(0, 1.5, 1),
+    )
     return scene;
 };
 const scene = createScene();
