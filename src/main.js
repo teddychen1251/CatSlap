@@ -10,6 +10,23 @@ const createScene = async function () {
         disablePointerSelection: true,
         inputOptions: { doNotLoadControllerMeshes: true },
     });
+    (async () => {
+        const audioEngine = await BABYLON.CreateAudioEngineAsync(
+            {
+                // listenerEnabled: true,
+                volume: 0.3
+            }
+        );
+        audioEngine.listener.attach(xr.baseExperience.camera)
+        const meow = await BABYLON.CreateSoundAsync("meow",
+            "assets/meow-2kb.mp3",
+            { spatialEnabled: true }
+        );
+        meow.spatial.coneInnerAngle = Math.PI / 4
+
+        await audioEngine.unlockAsync();
+        Cage.meow = meow
+    })();
     xr.baseExperience.featuresManager.enableFeature(
         BABYLON.WebXRFeatureName.HAND_TRACKING, 
         "latest", 
@@ -24,11 +41,7 @@ const createScene = async function () {
     xr.baseExperience.camera.setTransformationFromNonVRCamera()
     const player = new Player(scene, xr);
     const cage = new Cage(scene);
-    const arm = new ExtendingArm(scene)
-    arm.spawnAndPoint(
-        new BABYLON.Vector3(1, 1, 1),
-        new BABYLON.Vector3(0, 1.5, 1),
-    )
+    xr.baseExperience.sessionManager.onXRSessionInit.add(() => cage.beginArmSpawning(scene, player))
     return scene;
 };
 const scene = createScene();

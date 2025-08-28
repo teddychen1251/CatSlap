@@ -28,4 +28,7 @@ class Player {
     get headPosition() {
         return this.#headCamera.position
     }
+    get bodyPosition() {
+        return this.#bodyMesh.position
+    }
 }
