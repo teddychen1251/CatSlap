@@ -1,50 +1,32 @@
 const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+const soundsManager = new GameSoundsManager();
+Cage.meow = soundsManager.meow;
+Cage.soundsManager = soundsManager;
+const xr = setUpXR(scene)
 const createScene = async function () {
-    const scene = new BABYLON.Scene(engine);
     const camera = new BABYLON.FreeCamera("initialCam", new BABYLON.Vector3(0, 0, 0), scene);
-    camera.setTarget(BABYLON.Vector3.Zero());
     camera.attachControl(canvas, true);
     const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-    const xr = await scene.createDefaultXRExperienceAsync({
-        disablePointerSelection: true,
-        inputOptions: { doNotLoadControllerMeshes: true },
-    });
-    (async () => {
-        const audioEngine = await BABYLON.CreateAudioEngineAsync(
-            {
-                // listenerEnabled: true,
-                volume: 0.3
-            }
-        );
-        audioEngine.listener.attach(xr.baseExperience.camera)
-        const meow = await BABYLON.CreateSoundAsync("meow",
-            "assets/meow-2kb.mp3",
-            { spatialEnabled: true }
-        );
-        meow.spatial.coneInnerAngle = Math.PI / 4
-
-        await audioEngine.unlockAsync();
-        Cage.meow = meow
-    })();
-    xr.baseExperience.featuresManager.enableFeature(
-        BABYLON.WebXRFeatureName.HAND_TRACKING, 
-        "latest", 
-        {
-            xrInput: xr.input,
-            jointMeshes: {
-                disableDefaultHandMesh: true,
-                invisible: true,
-            },
-        }
-    );
-    xr.baseExperience.camera.setTransformationFromNonVRCamera()
-    const player = new Player(scene, xr);
+    const xrHelper = await xr
+    const player = new Player(scene, xrHelper);
     const cage = new Cage(scene);
-    xr.baseExperience.sessionManager.onXRSessionInit.add(() => cage.beginArmSpawning(scene, player))
+    xrHelper.baseExperience.onStateChangedObservable.add(async (state) => {
+        switch (state) {
+            case BABYLON.WebXRState.IN_XR: // noticing that I get spatial audio when I exit, then re-enter the session
+                cage.beginArmSpawning(scene, player)
+        }
+    })
+    xrHelper.baseExperience.sessionManager.onXRFrameObservable.add(async () => {
+    })
+    xrHelper.baseExperience.sessionManager.onXRSessionInit.add(async (session) => {
+        session.addEventListener('visibilitychange', async () => {
+            console.log(session.visibilityState)
+        })
+    })
     return scene;
 };
-const scene = createScene();
 createScene().then(scene => {
     engine.runRenderLoop(() => scene.render());
 })

@@ -3,6 +3,8 @@ class Cage {
     static #diameter = 3
     static #spawnPaceMs = 3000
     static meow;
+    static soundsManager;
+    initializedSounds = false
     mesh;
 
     constructor(scene) {
@@ -31,24 +33,32 @@ class Cage {
         scene.onBeforeRenderObservable.add(() => {
             if (Cage.meow === undefined) return
             if (performance.now() - lastSpawnTime >= Cage.#spawnPaceMs) {
-                const arm = this.spawnArm(scene, player.bodyPosition)
-                Cage.meow.spatial.attach(arm.arm)
+                const spawn = this.randomWallPoint()
+                const arm = this.spawnArm(scene, spawn, player.bodyPosition)
+                // Cage.meow.spatial.attach(arm.node)
+                if (soundsManager.context.state == "suspended") {
+                    soundsManager.context.resume();
+                }
                 Cage.meow.play()
                 lastSpawnTime = performance.now()
             }
         })
     }
 
-    spawnArm(scene, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {
+    randomWallPoint() {
         // pick point on cage wall
         const angle = Math.random() * 2 * Math.PI;
         const height = Math.random() * Cage.#height;
+        return new BABYLON.Vector3(
+            Math.cos(angle) * Cage.#diameter / 2,
+            height,
+            Math.sin(angle) * Cage.#diameter / 2,
+        )
+    }
+
+    spawnArm(scene, spawnPoint, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {
         return new ExtendingArm(scene).spawnAndPoint(
-            new BABYLON.Vector3(
-                Math.cos(angle) * Cage.#diameter / 2,
-                height,
-                Math.sin(angle) * Cage.#diameter / 2,
-            ),
+            spawnPoint,
             playerPosition,
         )
     }
