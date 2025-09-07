@@ -1,8 +1,7 @@
 class GameSoundsManager {
     constructor() {
-        // this.audioEngine = audioEngine
         this.context = new AudioContext();
-        const panner = new PannerNode(
+        this.panner = new PannerNode(
             this.context,
             {
                 panningModel: "HRTF",
@@ -11,17 +10,40 @@ class GameSoundsManager {
             }
         );
         const meow = document.getElementById("meow");
-        this.context.createMediaElementSource(meow).connect(panner).connect(this.context.destination);
+        this.context.createMediaElementSource(meow).connect(this.panner).connect(this.context.destination);
         this.meow = meow;
     }
+
+    updateListener(xrCamera) {
+        // note that Babylon is left-handed (+z into screen) 
+        // while WebAudio is right-handed (+z out of screen)
+        const position = xrCamera.position;
+        this.context.listener.positionX.value = position.x;
+        this.context.listener.positionY.value = position.y;
+        this.context.listener.positionZ.value = -position.z;
+        const cameraForward = BABYLON.Vector3.TransformNormal(
+            BABYLON.Vector3.Forward(),
+            xrCamera.getWorldMatrix()
+        );
+        this.context.listener.forwardX.value = cameraForward.x;
+        this.context.listener.forwardY.value = cameraForward.y;
+        this.context.listener.forwardZ.value = -cameraForward.z;
+        const cameraUp = BABYLON.Vector3.TransformNormal(
+            BABYLON.Vector3.Up(),
+            xrCamera.getWorldMatrix()
+        );
+        this.context.listener.upX.value = cameraUp.x;
+        this.context.listener.upY.value = cameraUp.y;
+        this.context.listener.upZ.value = -cameraUp.z;
+    }
+
+    playMeow(position) {
+        if (this.context.state == "suspended") {
+            this.context.resume();
+        }
+        this.panner.positionX.value = position.x;
+        this.panner.positionY.value = position.y;
+        this.panner.positionZ.value = -position.z;
+        this.meow.play()
+    }
 }
-const setUpAudio = () => {
-    // const audioEngine = await BABYLON.CreateAudioEngineAsync();
-    // const meow = await BABYLON.CreateSoundAsync(
-    //     "meow",
-    //     "assets/meow-2kb.mp3",
-    //     { spatialEnabled: true }
-    // );
-    // await audioEngine.unlockAsync();
-    return new GameSoundsManager()
-};

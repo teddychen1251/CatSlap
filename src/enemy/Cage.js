@@ -2,12 +2,10 @@ class Cage {
     static #height = 2
     static #diameter = 3
     static #spawnPaceMs = 3000
-    static meow;
-    static soundsManager;
-    initializedSounds = false
+    soundsManager;
     mesh;
 
-    constructor(scene) {
+    constructor(scene, soundsManager) {
         this.mesh = BABYLON.MeshBuilder.CreateCylinder(
             "cage", 
             {
@@ -17,29 +15,17 @@ class Cage {
             }, 
             scene,
         );
-        this.mesh.position.y = 1
+        this.mesh.position.y = 1;
+        this.soundsManager = soundsManager;
     }
 
     beginArmSpawning(scene, player) {
         let lastSpawnTime = performance.now()
-        let boomBox = BABYLON.MeshBuilder.CreateBox(
-            "boomBox", 
-            {
-                size: 0.2,
-            }, 
-            scene,
-        );
-        boomBox.position = new BABYLON.Vector3(1, 1, 1)
         scene.onBeforeRenderObservable.add(() => {
-            if (Cage.meow === undefined) return
             if (performance.now() - lastSpawnTime >= Cage.#spawnPaceMs) {
                 const spawn = this.randomWallPoint()
                 const arm = this.spawnArm(scene, spawn, player.bodyPosition)
-                // Cage.meow.spatial.attach(arm.node)
-                if (soundsManager.context.state == "suspended") {
-                    soundsManager.context.resume();
-                }
-                Cage.meow.play()
+                this.soundsManager.playMeow(spawn);
                 lastSpawnTime = performance.now()
             }
         })
