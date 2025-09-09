@@ -4,8 +4,10 @@ class Cage {
     static #spawnPaceMs = 3000
     soundsManager;
     mesh;
+    player;
 
-    constructor(scene, soundsManager) {
+    constructor(scene, soundsManager, player) {
+        this.player = player;
         this.mesh = BABYLON.MeshBuilder.CreateCylinder(
             "cage", 
             {
@@ -43,7 +45,7 @@ class Cage {
     }
 
     spawnArm(scene, spawnPoint, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {
-        return new ExtendingArm(scene).spawnAndPoint(
+        return new ExtendingArm(scene, this.player).spawnAndPoint(
             spawnPoint,
             playerPosition,
         )

@@ -9,7 +9,7 @@ const createScene = async function () {
     const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
     const xr = await xrPromise
     const player = new Player(scene, xr);
-    const cage = new Cage(scene, soundsManager);
+    const cage = new Cage(scene, soundsManager, player);
     xr.baseExperience.sessionManager.onXRFrameObservable.add(() => {
         soundsManager.updateListener(xr.baseExperience.camera);
     });

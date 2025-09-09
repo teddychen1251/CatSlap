@@ -1,8 +1,13 @@
 class ExtendingArm {
+    scene;
     node;
     arm;
+    player;
     #paw;
-    constructor(scene) {
+    updater;
+    constructor(scene, player) {
+        this.scene = scene;
+        this.player = player;
         this.node = new BABYLON.TransformNode("extendingArm", scene)
 
         const armHeight = 0.1
@@ -27,14 +32,20 @@ class ExtendingArm {
 
         this.#paw = new Paw(scene);
 
-        const start = performance.now()
-        scene.onBeforeRenderObservable.add(() => {
-            if (performance.now() - start <= 5000) {
-                this.#paw.mesh.position = pawPositionNode.absolutePosition
-                this.node.scaling.y += 0.01
+        this.updater = scene.onBeforeRenderObservable.add(() => {
+            this.#paw.mesh.position = pawPositionNode.absolutePosition
+            this.node.scaling.y += 0.01
+            if (this.#paw.mesh.intersectsMesh(this.player.bodyMesh, false)) {
+                console.log("hit");
+                this.destroy();
             } else {
-                this.#paw.destroy()
-                this.arm.dispose()
+                for (let hand of player.hands) {
+                    if (hand.blocks(this.#paw)) {
+                        console.log("blocked");
+                        this.destroy();
+                        break;
+                    }
+                }
             }
         })
     }
@@ -47,5 +58,11 @@ class ExtendingArm {
             Math.PI / 2
         )
         return this
+    }
+
+    destroy() {
+        this.#paw.destroy();
+        this.arm.dispose();
+        this.scene.onBeforeRenderObservable.remove(this.updater);
     }
 }
