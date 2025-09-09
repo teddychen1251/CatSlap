@@ -34,7 +34,7 @@ class ExtendingArm {
 
         this.updater = scene.onBeforeRenderObservable.add(() => {
             this.#paw.mesh.position = pawPositionNode.absolutePosition
-            this.node.scaling.y += 0.01
+            this.node.scaling.y += 0.1
             if (this.#paw.mesh.intersectsMesh(this.player.bodyMesh, false)) {
                 console.log("hit");
                 this.destroy();
