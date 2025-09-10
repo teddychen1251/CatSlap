@@ -6,7 +6,10 @@ const xrPromise = setUpXR(scene)
 const createScene = async function () {
     const camera = new BABYLON.FreeCamera("initialCam", new BABYLON.Vector3(0, 0, 0), scene);
     camera.attachControl(canvas, true);
-    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    const ambientLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    ambientLight.intensity = 0.1;
+    const pointLight = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 1.7, 0), scene);
+    pointLight.intensity = 0.5;
     const xr = await xrPromise
     const player = new Player(scene, xr, soundsManager);
     const cage = new Cage(scene, soundsManager, player);

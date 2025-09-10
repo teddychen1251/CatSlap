@@ -18,6 +18,9 @@ class Cage {
             scene,
         );
         this.mesh.position.y = 1;
+        this.material = new BABYLON.StandardMaterial("cageMat", scene);
+        this.material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5); 
+        this.mesh.material = this.material;
         this.soundsManager = soundsManager;
     }
 
