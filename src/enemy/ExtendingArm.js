@@ -38,6 +38,7 @@ class ExtendingArm {
             if (this.#paw.mesh.intersectsMesh(this.player.bodyMesh, false)) {
                 console.log("hit");
                 this.destroy();
+                this.player.registerHit();
             } else {
                 for (let hand of player.hands) {
                     if (hand.blocks(this.#paw)) {

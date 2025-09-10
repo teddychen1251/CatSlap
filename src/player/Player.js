@@ -1,10 +1,15 @@
 class Player {
     static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075)
     #headCamera;
+    bodyMaterial;
     bodyMesh;
     hands = [];
+    lives = 3;
+    xr;
     constructor(scene, xr) {
+        this.xr = xr;
         this.#headCamera = xr.baseExperience.camera;
+        this.bodyMaterial = new BABYLON.StandardMaterial("bodyMat", scene);
         this.bodyMesh = BABYLON.MeshBuilder.CreateCapsule(
             "playerBody", 
             {
@@ -13,6 +18,7 @@ class Player {
             }, 
             scene
         ); 
+        this.bodyMesh.material = this.bodyMaterial;
         scene.onBeforeRenderObservable.add(() => {
             const headRotationY = this.#headCamera.rotationQuaternion.toEulerAngles().y
             const bodyOffset = Player.#bodyLocalOffset
@@ -23,6 +29,14 @@ class Player {
             this.hands.push(new Hand(controllerInputSource, scene));
         });
 
+    }
+
+    registerHit() {
+        this.lives--;
+        if (this.lives <= 0) {
+            this.xr.baseExperience.exitXRAsync();
+        }
+        this.bodyMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     }
 
     get headPosition() {
