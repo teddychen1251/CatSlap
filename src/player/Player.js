@@ -6,10 +6,13 @@ class Player {
     hands = [];
     lives = 3;
     xr;
-    constructor(scene, xr) {
+    soundsManager;
+    constructor(scene, xr, soundsManager) {
+        this.soundsManager = soundsManager;
         this.xr = xr;
         this.#headCamera = xr.baseExperience.camera;
         this.bodyMaterial = new BABYLON.StandardMaterial("bodyMat", scene);
+        this.bodyMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
         this.bodyMesh = BABYLON.MeshBuilder.CreateCapsule(
             "playerBody", 
             {
@@ -31,11 +34,13 @@ class Player {
 
     }
 
-    registerHit() {
+    registerHit(position) {
+        this.soundsManager.playHitHurt(position);
         this.lives--;
         if (this.lives <= 0) {
             this.xr.baseExperience.exitXRAsync();
         }
+        // make animation for color
         this.bodyMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
     }
 

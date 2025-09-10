@@ -5,7 +5,9 @@ class ExtendingArm {
     player;
     #paw;
     updater;
-    constructor(scene, player) {
+    soundsManager;
+    constructor(scene, player, soundsManager) {
+        this.soundsManager = soundsManager;
         this.scene = scene;
         this.player = player;
         this.node = new BABYLON.TransformNode("extendingArm", scene)
@@ -38,11 +40,12 @@ class ExtendingArm {
             if (this.#paw.mesh.intersectsMesh(this.player.bodyMesh, false)) {
                 console.log("hit");
                 this.destroy();
-                this.player.registerHit();
+                this.player.registerHit(this.#paw.mesh.position);
             } else {
                 for (let hand of player.hands) {
                     if (hand.blocks(this.#paw)) {
                         console.log("blocked");
+                        this.soundsManager.playBlock(hand.mesh.position);
                         this.destroy();
                         break;
                     }

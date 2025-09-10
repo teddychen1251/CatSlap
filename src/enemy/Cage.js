@@ -45,7 +45,7 @@ class Cage {
     }
 
     spawnArm(scene, spawnPoint, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {
-        return new ExtendingArm(scene, this.player).spawnAndPoint(
+        return new ExtendingArm(scene, this.player, this.soundsManager).spawnAndPoint(
             spawnPoint,
             playerPosition,
         )

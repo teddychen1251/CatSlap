@@ -12,6 +12,10 @@ class GameSoundsManager {
         const meow = document.getElementById("meow");
         this.context.createMediaElementSource(meow).connect(this.panner).connect(this.context.destination);
         this.meow = meow;
+        this.block = document.getElementById("block");
+        this.context.createMediaElementSource(this.block).connect(this.panner).connect(this.context.destination);
+        this.hitHurt = document.getElementById("hitHurt");
+        this.context.createMediaElementSource(this.hitHurt).connect(this.panner).connect(this.context.destination);
     }
 
     updateListener(xrCamera) {
@@ -45,5 +49,19 @@ class GameSoundsManager {
         this.panner.positionY.value = position.y;
         this.panner.positionZ.value = -position.z;
         this.meow.play()
+    }
+
+    playBlock(position) {
+        this.panner.positionX.value = position.x;
+        this.panner.positionY.value = position.y;
+        this.panner.positionZ.value = -position.z;
+        this.block.play();
+    }
+
+    playHitHurt(position) {
+        this.panner.positionX.value = position.x;
+        this.panner.positionY.value = position.y;
+        this.panner.positionZ.value = -position.z;
+        this.hitHurt.play();
     }
 }
