@@ -1,26 +1,40 @@
 class Cage {
-    static #height = 2
-    static #diameter = 3
+    static #height = 2;
+    static #diameter = 3;
+    static #barDiameter = 0.1;
     static #spawnPaceMs = 3000
+    static #barCount = 24;
     soundsManager;
     mesh;
     player;
 
     constructor(scene, soundsManager, player) {
         this.player = player;
-        this.mesh = BABYLON.MeshBuilder.CreateCylinder(
-            "cage", 
-            {
-                height: Cage.#height,
-                diameter: Cage.#diameter,
-                sideOrientation: BABYLON.Mesh.BACKSIDE,
-            }, 
-            scene,
-        );
-        this.mesh.position.y = 1;
         this.material = new BABYLON.StandardMaterial("cageMat", scene);
-        this.material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5); 
-        this.mesh.material = this.material;
+        this.material.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7); 
+        const cageBottom = BABYLON.MeshBuilder.CreateDisc("cageBottom", {
+            radius: Cage.#diameter / 2,
+        }, scene);
+        cageBottom.rotation.x = Math.PI / 2;
+        cageBottom.material = this.material;
+        const cageTop = cageBottom.clone("cageTop");
+        cageTop.rotation.x = -Math.PI / 2;
+        cageTop.position.y = Cage.#height;
+        cageTop.material = this.material;
+        const cageBar = BABYLON.MeshBuilder.CreateCylinder("bar0", {
+            height: 2,
+            diameter: Cage.#barDiameter,
+        }, scene);
+        cageBar.material = this.material;
+        const maxCageBarOffset = Cage.#diameter / 2 - (Cage.#barDiameter / 2); 
+        cageBar.position.y = 1;
+        cageBar.position.z = maxCageBarOffset;
+        for (let bar = 1; bar < Cage.#barCount; bar++) {
+            const newBar = cageBar.clone("bar" + bar);
+            newBar.position.z = maxCageBarOffset * Math.cos(bar * 2 * Math.PI / Cage.#barCount);
+            newBar.position.x = maxCageBarOffset * Math.sin(bar * 2 * Math.PI / Cage.#barCount);
+        }
+        
         this.soundsManager = soundsManager;
     }
 
