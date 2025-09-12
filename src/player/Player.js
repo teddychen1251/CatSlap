@@ -1,5 +1,6 @@
 class Player {
-    static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075)
+    static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075);
+    static materialColor = new BABYLON.Color3(1, 1, 1);
     #headCamera;
     bodyMaterial;
     bodyMesh;
@@ -7,12 +8,13 @@ class Player {
     lives = 3;
     xr;
     soundsManager;
+    #flashing = null;
     constructor(scene, xr, soundsManager) {
         this.soundsManager = soundsManager;
         this.xr = xr;
         this.#headCamera = xr.baseExperience.camera;
         this.bodyMaterial = new BABYLON.StandardMaterial("bodyMat", scene);
-        this.bodyMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1);
+        this.bodyMaterial.diffuseColor = Player.materialColor;
         this.bodyMesh = BABYLON.MeshBuilder.CreateCapsule(
             "playerBody", 
             {
@@ -29,7 +31,7 @@ class Player {
             this.bodyMesh.position = this.#headCamera.position.subtract(bodyOffset);
         })
         xr.input.onControllerAddedObservable.add(controllerInputSource => {
-            this.hands.push(new Hand(controllerInputSource, scene));
+            this.hands.push(new Hand(controllerInputSource, scene, this.bodyMaterial));
         });
 
     }
@@ -40,8 +42,31 @@ class Player {
         if (this.lives <= 0) {
             this.xr.baseExperience.exitXRAsync();
         }
-        // make animation for color
-        this.bodyMaterial.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
+        this.#flashHit();
+    }
+
+    #flashHit() {
+        if (this.#flashing != null) {
+            clearInterval(this.#flashing);
+            this.bodyMaterial.diffuseColor = Player.materialColor;
+        }
+        let count = 0;
+        let limit = 3;
+        this.#flashing = setInterval(
+            () => {
+                if (this.bodyMaterial.diffuseColor.equals(Player.materialColor)) {
+                    this.bodyMaterial.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
+                } else {
+                    this.bodyMaterial.diffuseColor = Player.materialColor;
+                    count++;
+                }
+                if (count >= limit) {
+                    clearInterval(this.#flashing);
+                    this.#flashing = null;
+                }
+            },
+            167,
+        )
     }
 
     get headPosition() {
