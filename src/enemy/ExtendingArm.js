@@ -6,7 +6,9 @@ class ExtendingArm {
     #paw;
     updater;
     soundsManager;
-    constructor(scene, player, soundsManager) {
+    speedMultiplier;
+    constructor(scene, player, soundsManager, speedMultiplier) {
+        this.speedMultiplier = speedMultiplier;
         this.soundsManager = soundsManager;
         this.scene = scene;
         this.player = player;
@@ -36,15 +38,13 @@ class ExtendingArm {
 
         this.updater = scene.onBeforeRenderObservable.add(() => {
             this.#paw.mesh.position = pawPositionNode.absolutePosition
-            this.node.scaling.y += 0.1
+            this.node.scaling.y += 0.1 * speedMultiplier;
             if (this.#paw.mesh.intersectsMesh(this.player.bodyMesh, false)) {
-                console.log("hit");
                 this.destroy();
                 this.player.registerHit(this.#paw.mesh.position);
             } else {
                 for (let hand of player.hands) {
                     if (hand.blocks(this.#paw)) {
-                        console.log("blocked");
                         this.soundsManager.playBlock(hand.mesh.position);
                         this.destroy();
                         break;

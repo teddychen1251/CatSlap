@@ -2,12 +2,23 @@ class Cage {
     static #height = 2;
     static #diameter = 3;
     static #barDiameter = 0.1;
-    static #spawnPaceMs = 3000
+    static #maxSpawnPaceMs = 3000;
+    static #minSpawnPaceMs = 2000;
     static #barCount = 24;
+    static #difficultyCurve = [
+        [10, [1800, 2800]],
+        [20, [1500, 2200]],
+        [30, [1200, 1900]],
+        [40, [800, 1400]],
+        [50, [400, 1000]],
+    ].reverse();
     soundsManager;
     mesh;
     player;
     spawning;
+    difficulty = 1;
+    spawnedCount = 0;
+    nextSpawnInterval = Cage.#maxSpawnPaceMs;
 
     constructor(scene, soundsManager, player) {
         this.player = player;
@@ -42,9 +53,12 @@ class Cage {
     beginArmSpawning(scene, player) {
         let lastSpawnTime = performance.now()
         this.spawning = scene.onBeforeRenderObservable.add(() => {
-            if (performance.now() - lastSpawnTime >= Cage.#spawnPaceMs) {
+            if (performance.now() - lastSpawnTime >= this.nextSpawnInterval) {
                 const spawn = this.randomWallPoint()
                 const arm = this.spawnArm(scene, spawn, player.bodyPosition)
+                this.spawnedCount++;
+                this.setDifficulty();
+                this.nextSpawnInterval = Math.random() * (Cage.#maxSpawnPaceMs - Cage.#minSpawnPaceMs) + Cage.#minSpawnPaceMs;
                 this.soundsManager.playMeow(spawn);
                 lastSpawnTime = performance.now()
             }
@@ -67,9 +81,19 @@ class Cage {
     }
 
     spawnArm(scene, spawnPoint, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {
-        return new ExtendingArm(scene, this.player, this.soundsManager).spawnAndPoint(
+        return new ExtendingArm(scene, this.player, this.soundsManager, this.difficulty).spawnAndPoint(
             spawnPoint,
             playerPosition,
         )
+    }
+
+    setDifficulty() {
+        for (let level of Cage.#difficultyCurve) {
+            if (this.spawnedCount >= level[0]) {
+                Cage.#minSpawnPaceMs = level[1][0];
+                Cage.#maxSpawnPaceMs = level[1][1];
+                break;
+            }
+        }
     }
 }
