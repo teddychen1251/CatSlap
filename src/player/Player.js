@@ -1,4 +1,5 @@
 class Player {
+    static diedEventId = "player_died";
     static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075);
     static materialColor = new BABYLON.Color3(1, 1, 1);
     #headCamera;
@@ -40,6 +41,7 @@ class Player {
         this.soundsManager.playHitHurt(position);
         this.lives--;
         if (this.lives <= 0) {
+            dispatchEvent(new Event(Player.diedEventId));
             this.xr.baseExperience.exitXRAsync();
         }
         this.#flashHit();

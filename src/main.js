@@ -39,7 +39,8 @@ const createScene = async function () {
             case BABYLON.WebXRState.IN_XR:
                 cage.beginArmSpawning(scene, player)
         }
-    })
+    });
+    addEventListener("player_died", () => cage.stopSpawning(scene));
     return scene;
 };
 createScene().then(scene => {

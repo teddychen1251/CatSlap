@@ -7,6 +7,7 @@ class Cage {
     soundsManager;
     mesh;
     player;
+    spawning;
 
     constructor(scene, soundsManager, player) {
         this.player = player;
@@ -40,7 +41,7 @@ class Cage {
 
     beginArmSpawning(scene, player) {
         let lastSpawnTime = performance.now()
-        scene.onBeforeRenderObservable.add(() => {
+        this.spawning = scene.onBeforeRenderObservable.add(() => {
             if (performance.now() - lastSpawnTime >= Cage.#spawnPaceMs) {
                 const spawn = this.randomWallPoint()
                 const arm = this.spawnArm(scene, spawn, player.bodyPosition)
@@ -48,6 +49,10 @@ class Cage {
                 lastSpawnTime = performance.now()
             }
         })
+    }
+    
+    stopSpawning(scene) {
+        scene.onBeforeRenderObservable.remove(this.spawning);
     }
 
     randomWallPoint() {
