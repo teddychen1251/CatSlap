@@ -40,7 +40,10 @@ const createScene = async function () {
                 cage.beginArmSpawning(scene, player)
         }
     });
-    addEventListener("player_died", () => cage.stopSpawning(scene));
+    addEventListener("player_died", () => {
+        cage.stopSpawning(scene);
+        window.alert(`You slapped ${cage.spawnedCount} paws!`);
+    });
     return scene;
 };
 createScene().then(scene => {
