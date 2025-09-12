@@ -42,7 +42,7 @@ const createScene = async function () {
     });
     addEventListener("player_died", () => {
         cage.stopSpawning(scene);
-        window.alert(`You slapped ${cage.spawnedCount} paws!`);
+        console.log(`You slapped ${cage.spawnedCount} paws!`);
     });
     return scene;
 };
