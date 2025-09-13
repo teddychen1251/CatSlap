@@ -6,6 +6,11 @@ class CatHead {
     static pupilRadius = 0.01;
     static pupilHeight = this.eyeRadius;
     static noseRadius = 0.02;
+    static jowlHeight = 0.04;
+    static jowlDiameter = 0.008;
+    static jowlNoseOffset = 0.05;
+    static whiskerLen = 0.15;
+    static whiskerDiameter = 0.002;
     headMesh;
     constructor(scene) {
         const headMaterial = new BABYLON.StandardMaterial("catHeadMat", scene);
@@ -72,6 +77,39 @@ class CatHead {
         this.noseMesh.position.z = CatHead.headRadius;
         this.noseMesh.parent = this.headMesh;
         this.noseMesh.rotateAround(BABYLON.Vector3.Zero(), BABYLON.Vector3.Right(), Math.PI / 20);
+
+        const mouthMaterial = new BABYLON.StandardMaterial("mouthMat", scene);
+        mouthMaterial.diffuseColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+        this.rightJowl = BABYLON.MeshBuilder.CreateCylinder("rightJowl", {
+            height: CatHead.jowlHeight,
+            diameter: CatHead.jowlDiameter,
+        }, scene);
+        this.rightJowl.material = mouthMaterial;
+        this.rightJowl.position.copyFrom(this.noseMesh.absolutePosition);
+        this.rightJowl.position.y -= CatHead.jowlHeight / 2 - 0.003;
+        this.leftJowl = this.rightJowl.clone("leftJowl");
+        this.leftJowl.material = mouthMaterial;
+        this.rightJowl.rotateAround(this.noseMesh.absolutePosition, BABYLON.Vector3.Forward(), Math.PI / 4);
+        this.leftJowl.rotateAround(this.noseMesh.absolutePosition, BABYLON.Vector3.Forward(), -Math.PI / 4);
+        this.rightJowl.position.y -= CatHead.jowlNoseOffset;
+        this.leftJowl.position.y -= CatHead.jowlNoseOffset;
+        this.rightJowl.parent = this.headMesh;
+        this.leftJowl.parent = this.headMesh;
+
+        this.whisker0 = BABYLON.MeshBuilder.CreateCylinder("whisker0", {
+            height: CatHead.whiskerLen,
+            diameter: CatHead.whiskerDiameter,
+        }, scene);
+        this.whisker0.material = mouthMaterial;
+        this.whisker0.position.copyFrom(this.noseMesh.absolutePosition);
+        this.whisker1 = this.whisker0.clone("whisker1");
+        this.whisker2 = this.whisker0.clone("whisker2");
+        this.whisker0.rotation.z = Math.PI / 2;
+        this.whisker1.rotation.z = Math.PI / 6 + Math.PI / 2;
+        this.whisker2.rotation.z = -Math.PI / 6 + Math.PI / 2;
+        this.whisker0.parent = this.headMesh;
+        this.whisker1.parent = this.headMesh;
+        this.whisker2.parent = this.headMesh;
     }
 
     setPosition(position) {
