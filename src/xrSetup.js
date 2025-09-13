@@ -14,6 +14,5 @@ const setUpXR = async (scene) => {
             },
         }
     );
-    xr.baseExperience.camera.setTransformationFromNonVRCamera()
     return xr
 }

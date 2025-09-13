@@ -2,7 +2,6 @@ const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);
 const scene = new BABYLON.Scene(engine);
 const soundsManager = new GameSoundsManager();
-const xrPromise = setUpXR(scene)
 const createScene = async function () {
     scene.clearColor = new BABYLON.Color3(0, 0, 0);
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
@@ -14,8 +13,11 @@ const createScene = async function () {
     const skyBoxMat = new BABYLON.StandardMaterial("skyMat", scene);
     skyBoxMat.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.1);
     skyBox.material = skyBoxMat;
-    const camera = new BABYLON.FreeCamera("initialCam", new BABYLON.Vector3(0, 0, 0), scene);
+    const camera = new BABYLON.FreeCamera("initialCam", new BABYLON.Vector3(0, -1, 0), scene);
     camera.attachControl(canvas, true);
+    const catHead = new CatHead(scene);
+    catHead.setPosition(new BABYLON.Vector3(0, -1, -2));
+    camera.setTarget(catHead.getPosition());
     const ambientLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
     ambientLight.intensity = 0.1;
     const pointLight = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 1.7, 0), scene);
@@ -28,7 +30,7 @@ const createScene = async function () {
     groundMat.diffuseColor = new BABYLON.Color3(0.651, 0.482, 0.357);
     ground.material = groundMat;
     ground.position.y = -0.0001;
-    const xr = await xrPromise
+    const xr = await setUpXR(scene);
     const player = new Player(scene, xr, soundsManager);
     const cage = new Cage(scene, soundsManager, player);
     xr.baseExperience.sessionManager.onXRFrameObservable.add(() => {
@@ -37,6 +39,8 @@ const createScene = async function () {
     xr.baseExperience.onStateChangedObservable.add(async (state) => {
         switch (state) {
             case BABYLON.WebXRState.IN_XR:
+                camera.position.copyFrom(new BABYLON.Vector3(0, 0, 0));
+                xr.baseExperience.camera.setTransformationFromNonVRCamera(camera);
                 cage.beginArmSpawning(scene, player)
         }
     });
