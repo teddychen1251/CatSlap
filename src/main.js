@@ -6,6 +6,7 @@ const createScene = async function () {
     scene.clearColor = new BABYLON.Color3(0, 0, 0);
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
     scene.fogColor = new BABYLON.Color3(0.11, 0.11, 0.11);
+    scene.debugLayer.show();
     const skyBox = BABYLON.MeshBuilder.CreateBox("skyBox", {
         size: 100,
         sideOrientation: BABYLON.Mesh.BACKSIDE,

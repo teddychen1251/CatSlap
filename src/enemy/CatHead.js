@@ -4,6 +4,7 @@ class CatHead {
     static earHeight = 0.25;
     static eyeRadius = 0.1;
     static pupilRadius = 0.01;
+    static pupilHeight = this.eyeRadius;
     static noseRadius = 0.02;
     headMesh;
     constructor(scene) {
@@ -50,8 +51,16 @@ class CatHead {
         this.leftEyeMesh.rotateAround(BABYLON.Vector3.Zero(), BABYLON.Vector3.Forward(), Math.PI / 3.5);
         this.rightPupilMesh = BABYLON.MeshBuilder.CreateCapsule("rightPupil", {
             radius: CatHead.pupilRadius, 
+            height: CatHead.pupilHeight,
             capSubdivisions: 1,
         }, scene);
+        this.rightPupilMesh.material = headMaterial;
+        this.rightPupilMesh.position.copyFrom(this.rightEyeMesh.absolutePosition);
+        this.rightPupilMesh.position.z += CatHead.eyeRadius;
+        this.rightPupilMesh.parent = this.headMesh;
+        this.leftPupilMesh = this.rightPupilMesh.clone("leftPupil");
+        this.leftPupilMesh.position.copyFrom(this.leftEyeMesh.absolutePosition);
+        this.leftPupilMesh.position.z += CatHead.eyeRadius;
 
         const noseMaterial = new BABYLON.StandardMaterial("noseMat", scene);
         noseMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.7, 0.75);
@@ -63,7 +72,6 @@ class CatHead {
         this.noseMesh.position.z = CatHead.headRadius;
         this.noseMesh.parent = this.headMesh;
         this.noseMesh.rotateAround(BABYLON.Vector3.Zero(), BABYLON.Vector3.Right(), Math.PI / 20);
-
     }
 
     setPosition(position) {
