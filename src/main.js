@@ -6,7 +6,6 @@ const createScene = async function () {
     scene.clearColor = new BABYLON.Color3(0, 0, 0);
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
     scene.fogColor = new BABYLON.Color3(0.11, 0.11, 0.11);
-    scene.debugLayer.show();
     const skyBox = BABYLON.MeshBuilder.CreateBox("skyBox", {
         size: 100,
         sideOrientation: BABYLON.Mesh.BACKSIDE,
@@ -16,9 +15,9 @@ const createScene = async function () {
     skyBox.material = skyBoxMat;
     const camera = new BABYLON.FreeCamera("initialCam", new BABYLON.Vector3(0, -1, 0), scene);
     camera.attachControl(canvas, true);
-    const catHead = new CatHead(scene);
-    catHead.setPosition(new BABYLON.Vector3(0, -1, -2));
-    camera.setTarget(catHead.getPosition());
+    const uiCatHead = new CatHead(scene);
+    uiCatHead.setPosition(new BABYLON.Vector3(0, -1, -2));
+    camera.setTarget(uiCatHead.getPosition());
     const ambientLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
     ambientLight.intensity = 0.1;
     const pointLight = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 1.7, 0), scene);
@@ -47,6 +46,8 @@ const createScene = async function () {
     });
     addEventListener("player_died", () => {
         cage.stopSpawning(scene);
+        scene.activeCamera = camera;
+        uiCatHead.setPosition(camera.position.add(new BABYLON.Vector3(0, 1.3, -2)))
         console.log(`You slapped ${cage.spawnedCount} paws!`);
     });
     return scene;
