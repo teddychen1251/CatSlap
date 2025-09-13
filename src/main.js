@@ -33,6 +33,14 @@ const createScene = async function () {
     const xr = await setUpXR(scene);
     const player = new Player(scene, xr, soundsManager);
     const cage = new Cage(scene, soundsManager, player);
+    const endScreen = new BABYLON.MeshBuilder.CreatePlane("endScreen", {
+        width: 0.7,
+        height: 0.1,
+    }, scene);
+    endScreen.rotation.y = Math.PI;
+    endScreen.position.y = 0.9;
+    endScreen.position.z -= 1.2;
+    endScreen.isVisible = false;
     xr.baseExperience.sessionManager.onXRFrameObservable.add(() => {
         soundsManager.updateListener(xr.baseExperience.camera);
     });
@@ -48,7 +56,16 @@ const createScene = async function () {
         cage.stopSpawning(scene);
         scene.activeCamera = camera;
         uiCatHead.setPosition(camera.position.add(new BABYLON.Vector3(0, 1.3, -2)))
-        console.log(`You slapped ${cage.spawnedCount} paws!`);
+        camera.setTarget(camera.position.add(new BABYLON.Vector3(0, 0, -10)));
+        const endScreenTexture = new BABYLON.DynamicTexture("endTexture", {
+            width: 700,
+            height: 100,
+        }, scene);
+        endScreenTexture.drawText(`You survived ${cage.spawnedCount - 1} paws`, 100, 60, "bold 44px monospace", "white", "black", true, true);
+        const endScreenMaterial = new BABYLON.StandardMaterial("endMat", scene);
+        endScreenMaterial.diffuseTexture = endScreenTexture;
+        endScreen.material = endScreenMaterial;
+        endScreen.isVisible = true;
     });
     return scene;
 };
