@@ -2,7 +2,7 @@ class Player {
     static diedEventId = "player_died";
     static #bodyLocalOffset = new BABYLON.Vector3(0, .45, 0.075);
     static materialColor = new BABYLON.Color3(1, 1, 1);
-    #headCamera;
+    headCamera;
     bodyMaterial;
     bodyMesh;
     hands = [];
@@ -13,7 +13,7 @@ class Player {
     constructor(scene, xr, soundsManager) {
         this.soundsManager = soundsManager;
         this.xr = xr;
-        this.#headCamera = xr.baseExperience.camera;
+        this.headCamera = xr.baseExperience.camera;
         this.bodyMaterial = new BABYLON.StandardMaterial("bodyMat", scene);
         this.bodyMaterial.diffuseColor = Player.materialColor;
         this.bodyMesh = BABYLON.MeshBuilder.CreateCapsule(
@@ -26,10 +26,10 @@ class Player {
         ); 
         this.bodyMesh.material = this.bodyMaterial;
         scene.onBeforeRenderObservable.add(() => {
-            const headRotationY = this.#headCamera.rotationQuaternion.toEulerAngles().y
+            const headRotationY = this.headCamera.rotationQuaternion.toEulerAngles().y
             const bodyOffset = Player.#bodyLocalOffset
                 .applyRotationQuaternion(BABYLON.Quaternion.FromEulerAngles(0, headRotationY, 0))
-            this.bodyMesh.position = this.#headCamera.position.subtract(bodyOffset);
+            this.bodyMesh.position = this.headCamera.position.subtract(bodyOffset);
         })
         xr.input.onControllerAddedObservable.add(controllerInputSource => {
             this.hands.push(new Hand(controllerInputSource, scene, this.bodyMaterial));
@@ -72,7 +72,7 @@ class Player {
     }
 
     get headPosition() {
-        return this.#headCamera.position
+        return this.headCamera.position
     }
     get bodyPosition() {
         return this.bodyMesh.position

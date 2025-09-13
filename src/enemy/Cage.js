@@ -10,7 +10,7 @@ class Cage {
         [20, [1500, 2200]],
         [30, [1200, 1900]],
         [40, [800, 1400]],
-        [50, [400, 1000]],
+        [50, [800, 1000]],
     ].reverse();
     soundsManager;
     mesh;
@@ -19,8 +19,11 @@ class Cage {
     difficulty = 1;
     spawnedCount = 0;
     nextSpawnInterval = Cage.#maxSpawnPaceMs;
+    catHead;
 
     constructor(scene, soundsManager, player) {
+        this.catHead = new CatHead(scene);
+        this.catHead.setPosition(new BABYLON.Vector3(0, -10, 0));
         this.player = player;
         this.material = new BABYLON.StandardMaterial("cageMat", scene);
         this.material.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7); 
@@ -55,6 +58,8 @@ class Cage {
         this.spawning = scene.onBeforeRenderObservable.add(() => {
             if (performance.now() - lastSpawnTime >= this.nextSpawnInterval) {
                 const spawn = this.randomWallPoint()
+                this.catHead.setPosition(this.catHeadPosFromWallPoint(spawn));
+                this.catHead.lookAt(player.headCamera.position);
                 const arm = this.spawnArm(scene, spawn, player.bodyPosition)
                 this.spawnedCount++;
                 this.setDifficulty();
@@ -67,6 +72,7 @@ class Cage {
     
     stopSpawning(scene) {
         scene.onBeforeRenderObservable.remove(this.spawning);
+        this.catHead.destroy();
     }
 
     randomWallPoint() {
@@ -78,6 +84,12 @@ class Cage {
             height,
             Math.sin(angle) * Cage.#diameter / 2,
         )
+    }
+
+    catHeadPosFromWallPoint(position) {
+        const catHeadPos = position.clone();
+        catHeadPos.y = 1.3;
+        return catHeadPos.multiplyByFloats(1.4, 1, 1.4);
     }
 
     spawnArm(scene, spawnPoint, playerPosition, maxOffsetX, maxOffsetY, maxOffsetZ) {

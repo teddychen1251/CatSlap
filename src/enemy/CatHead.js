@@ -123,4 +123,15 @@ class CatHead {
     setRotation(rotation) {
         this.headMesh.position.copyFrom(rotation);
     }
+
+    setVisible(isVisible) {
+        this.headMesh.isVisible = isVisible;
+    }
+
+    destroy() {
+        this.headMesh.dispose();
+    }
+    lookAt(position) {
+        this.headMesh.lookAt(position);
+    }
 }
